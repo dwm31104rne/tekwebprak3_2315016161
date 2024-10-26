@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>To-Do App</title>
+    <style>
+        /* Font Estetik dari Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Raleway:wght@400&display=swap');
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #333;
+            text-align: center;
+        }
+
+        h2 {
+            font-family: 'Amatic SC', cursive;
+            font-size: 3em;
+            color: #4e5c68;
+        }
+
+        .container {
+            width: 350px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #f77f00;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+        }
+
+        button:hover {
+            background-color: #d65a00;
+        }
+
+        #taskList {
+            list-style: none;
+            padding: 0;
+        }
+
+        #taskList li {
+            padding: 10px;
+            margin: 5px 0;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        #taskList li.completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .close {
+            color: red;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>My To-Do List</h2>
+        <input type="text" id="newTask" placeholder="Add a new task...">
+        <button onclick="addTask()">Add</button>
+
+        <ul id="taskList">
+        </ul>
+
+        <h3>Change Appearance</h3>
+        <select id="bgColorSelect" onchange="changeBackgroundColor()">
+            <option value="default">Select Background Color</option>
+            <option value="#ffcccb">Light Pink</option>
+            <option value="#ccffcc">Light Green</option>
+            <option value="#cce0ff">Light Blue</option>
+        </select>
+        <button onclick="increaseFontSize()">Increase Font Size</button>
+        <button onclick="decreaseFontSize()">Decrease Font Size</button>
+        <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+        <button onclick="changeFontStyle()">Change Font Style</button>
+    </div>
+
+    <script>
+        // Fungsi untuk menambahkan tugas baru
+        function addTask() {
+            const taskInput = document.getElementById('newTask');
+            const taskText = taskInput.value.trim();
+
+            // Pastikan input tidak kosong
+            if (taskText === "") {
+                alert("Tugas ga bisa kosong!");
+                return;
+            }
+
+            // Buat elemen li baru
+            const li = document.createElement('li');
+            li.textContent = taskText;
+
+            // Tambahkan tombol 'X' untuk menghapus
+            const closeButton = document.createElement('span');
+            closeButton.textContent = 'X';
+            closeButton.classList.add('close');
+            closeButton.onclick = () => deleteTask(li);
+
+            li.appendChild(closeButton);
+
+            // Tambahkan event untuk edit dengan double click
+            li.ondblclick = () => editTask(li);
+
+            // Tambahkan event untuk menandai tugas sebagai selesai dengan klik
+            li.onclick = () => li.classList.toggle('completed');
+
+            // Masukkan li ke dalam taskList
+            const taskList = document.getElementById('taskList');
+            taskList.appendChild(li);
+
+            // Kosongkan input setelah menambah tugas
+            taskInput.value = '';
+        }
+
+        // Fungsi untuk menghapus tugas
+        function deleteTask(element) {
+            element.remove();
+        }
+
+        // Fungsi untuk mengedit tugas
+        function editTask(element) {
+            const currentText = element.firstChild.textContent;
+            const newText = prompt("EDIT TUGASNYA LAGI", currentText);
+
+            // Jika pengguna memasukkan teks baru, update teksnya
+            if (newText !== null && newText.trim() !== "") {
+                element.firstChild.textContent = newText.trim();
+            }
+        }
+
+        // Fungsi untuk mengubah warna background
+        function changeBackgroundColor() {
+            const selectedColor = document.getElementById("bgColorSelect").value;
+            if (selectedColor === "default") {
+                document.body.style.background = "linear-gradient(135deg, #f6d365 0%, #fda085 100%)";
+            } else {
+                document.body.style.background = selectedColor;
+            }
+        }
+
+        // Fungsi untuk meningkatkan ukuran font
+        function increaseFontSize() {
+            document.body.style.fontSize = "larger";
+        }
+
+        // Fungsi untuk mengurangi ukuran font
+        function decreaseFontSize() {
+            document.body.style.fontSize = "smaller";
+        }
+
+        // Fungsi untuk mengaktifkan mode gelap
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+            if (document.body.classList.contains("dark-mode")) {
+                document.body.style.background = "#333";
+                document.body.style.color = "#fff";
+            } else {
+                document.body.style.background = "linear-gradient(135deg, #f6d365 0%, #fda085 100%)";
+                document.body.style.color = "#333";
+            }
+        }
+
+        // Fungsi untuk mengubah gaya font
+        let isUsingAmatic = false;
+        function changeFontStyle() {
+            const container = document.querySelector('.container');
+            const h2 = document.querySelector("h2");
+            const buttons = document.querySelectorAll("button");
+            const taskListItems = document.querySelectorAll("#taskList li");
+
+            // Toggle antara Raleway dan Amatic
+            if (isUsingAmatic) {
+                container.style.fontFamily = "'Raleway', sans-serif";
+                h2.style.fontFamily = "'Amatic SC', cursive";
+                buttons.forEach(button => button.style.fontFamily = "'Raleway', sans-serif");
+                taskListItems.forEach(item => item.style.fontFamily = "'Raleway', sans-serif");
+                isUsingAmatic = false;
+            } else {
+                container.style.fontFamily = "'Amatic SC', cursive";
+                h2.style.fontFamily = "'Raleway', sans-serif";
+                buttons.forEach(button => button.style.fontFamily = "'Amatic SC', cursive");
+                taskListItems.forEach(item => item.style.fontFamily = "'Amatic SC', cursive");
+                isUsingAmatic = true;
+            }
+
+            console.log("Font style changed to " + (isUsingAmatic ? "Amatic" : "Raleway"));
+        }
+    </script>
+
+</body>
+
+</html>
+
